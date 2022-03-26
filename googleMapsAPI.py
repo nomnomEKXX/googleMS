@@ -1,12 +1,12 @@
 import requests
 from flask import Flask, request, jsonify
 import json
+import os
 
-# userLocation = '556 Choa Chu Kang North 6'
-# storeAddress = 'Changi Prison'
+from dotenv import load_dotenv
+load_dotenv('./.env')
 
-APIKEY = "AIzaSyCd5JgqK3vcSWsx29XrLb7e4BnMjI2rtBw"
-
+key = os.getenv('GOOGLE_MAPS_API_KEY')
 app = Flask(__name__)
 
 @app.route("/stores/getDistance/<storeEmail>")
@@ -23,17 +23,22 @@ def getDistance():
         "https://maps.googleapis.com/maps/api/distancematrix/json"
         + "?origins={}".format(userLocation)
         + "&destinations={}".format(storeAddress)
-        + "&key={}".format(APIKEY)
+        + "&key={}".format(key)
     )
 
     payload = {}
     headers = {}
 
-    response = requests.request("GET", url, headers=headers, data=payload)
-    answer = json.loads(response.text)
-    distance = answer["rows"][0]["elements"][0]["distance"]["text"]
+    try:
+        response = requests.request("GET", url, headers=headers, data=payload)
+        answer = json.loads(response.text)
+        distance = answer["rows"][0]["elements"][0]["distance"]["text"]
+        return {"code": 200, "message": "Distance to travel: {}".format(distance)}
+    
 
-    return "Distance to travel: {}".format(distance)
+    except:
+        return {"code": 401, "message": "Failed to retrieve distance from user to store"}
+
 
 
 if __name__ == "__main__":
