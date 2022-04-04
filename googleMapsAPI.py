@@ -37,7 +37,7 @@ def getDistance():
     
 
     except:
-        return {"code": 401, "message": "Failed to retrieve distance from user to store"}
+        return {"code": 500, "message": "Error occured when retrieving distance"}
 
 
 
